@@ -284,4 +284,6 @@ function main(a) {
   console.log("hello main");
     a.completed({ allowEvent: !0 });
 }
-
+function hellow(){
+  console.log("hellow world");
+}
