@@ -2,6 +2,12 @@ function main(a) {
   console.error("Inside main");
   event.completed({ allowEvent: true });
 }
+
+function onMessageSendHandler(a) {
+  console.error("Inside onMessageSendHandler");
+  event.completed({ allowEvent: true });
+}
+
 function hellow(){
   console.log("hellow world");
 }
