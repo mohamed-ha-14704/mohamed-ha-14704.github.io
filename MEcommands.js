@@ -12,6 +12,6 @@ function hellow(){
   console.log("hellow world");
 }
   
-async function mainHandleAttachments(a) {
+function mainHandleAttachments(a) {
   console.error("Inside mainHandleAttachments");
 }
