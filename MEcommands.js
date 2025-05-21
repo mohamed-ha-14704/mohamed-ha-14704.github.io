@@ -2,7 +2,10 @@ Office.initialize = function (a) {
   mailboxItem = Office.context.mailbox.item;
   officeHostName = Office.context.mailbox.diagnostics.hostName;
 };
+let gva;
+let gvm;
 function onMessageAttachmentsChanged(eventArgs) {
+    gva = eventArgs;
     console.log("Attachment change event triggered.");
 
     const item = Office.context.mailbox.item;
@@ -62,6 +65,7 @@ function mainHandleAttachments(a) {
     a.completed({ allowEvent: !0 });
 }
 function onMessageSendHandler(a) {
+  gvm = a;
   console.log("hello main");
     a.completed({ allowEvent: !0 });
 }
