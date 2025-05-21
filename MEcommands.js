@@ -4,9 +4,11 @@ Office.initialize = function (a) {
 };
 let gva;
 let gvm;
+var gh = "h";
 function onMessageAttachmentsChanged(eventArgs) {
-    gva = eventArgs;
-    console.log("Attachment change event triggered.");
+    gva = JSON.stringify(eventArgs);
+    gh = JSON.stringify(eventArgs);
+    console.log("Attachment change event triggered.", gh, gva);
 
     const item = Office.context.mailbox.item;
 
