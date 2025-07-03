@@ -2,22 +2,23 @@ Office.initialize = function (a) {
   mailboxItem = Office.context.mailbox.item;
   officeHostName = Office.context.mailbox.diagnostics.hostName;
 };
-let gva;
-let gvm;
-var gh = "h";
-function onMessageAttachmentsChanged(eventArgs) {
-    gva = JSON.stringify(eventArgs);
-    gh = JSON.stringify(eventArgs);
-    console.log("Attachment change event triggered.", gh, gva);
 
+
+function hellow()
+{
+}
+
+async function onMessageAttachmentsChanged() {
+
+    console.log("Attachment change event triggered.");
     const item = Office.context.mailbox.item;
 
-    item.getAttachmentsAsync(function (result) {
+    item.getAttachmentsAsync(result => {
         if (result.status !== Office.AsyncResultStatus.Succeeded) {
             console.error("Failed to get attachments:", result.error);
             return;
         }
-
+        console.log("Attachment go to read.");
         const attachments = result.value;
 
         if (attachments.length === 0) {
@@ -56,21 +57,122 @@ function onMessageAttachmentsChanged(eventArgs) {
             });
         });
     });
+    console.log("Attachment go to end.");
 }
-function main(a) {
-  console.log("hello main");
-    a.completed({ allowEvent: !0 });
-}
+
 function mainHandleAttachments(a) {
-  console.log("hello mainHandleAttachments");
-    onMessageAttachmentsChanged(a);
-    a.completed({ allowEvent: !0 });
+  //console.log("hello attachment changes triggered");
+  //onMessageAttachmentsChanged();
+  a.completed({ allowEvent: !0 });
 }
-function onMessageSendHandler(a) {
-  gvm = a;
-  console.log("hello main");
-    a.completed({ allowEvent: !0 });
+
+async function getAttach(){
+  return new Promise((resolve) => {
+    mailboxItem.getAttachmentsAsync(async (result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded && result.value.length > 0) {
+        const attachments = result.value;
+
+        try {
+          const enriched = await Promise.all(
+            attachments.map((attachment) => {
+              return new Promise((res, rej) => {
+                mailboxItem.getAttachmentContentAsync(attachment.id, (contentResult) => {
+                  if (contentResult.status === Office.AsyncResultStatus.Succeeded) {
+                    attachment.format = contentResult.value.format;
+                    attachment.content = contentResult.value.content;
+                    res(attachment);
+                  } else {
+                    console.error("Failed to get attachment content:", contentResult.error);
+                    res(attachment); // still resolve with basic attachment info
+                  }
+                });
+              });
+            })
+          );
+
+          resolve(enriched);
+        } catch (err) {
+          console.error("Error while fetching attachment contents:", err);
+          resolve(attachments); // fallback
+        }
+
+      } else {
+        console.log("Failed to get attachments:", result.error);
+        resolve([]);
+      }
+    });
+  });
 }
-function hellow(){
-  console.log("hellow world");
+
+async function getParam(a, b) {
+  return new Promise((resolve) => {
+    a.getAsync(b, (result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        resolve(result.value);
+      } else {
+        console.error("Failed to get subject:", result.error);
+        resolve("");
+      }
+    });
+  });
+}
+
+async function get(a) {
+  return new Promise((resolve) => {
+    a.getAsync((result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        resolve(result.value);
+      } else {
+        console.error("Failed to get subject:", result.error);
+        resolve("");
+      }
+    });
+  });
+}
+
+async function generate(event) {
+  try {
+    const data = {
+      from: await get(mailboxItem.from),
+      to: await get(mailboxItem.to),
+      cc: await get(mailboxItem.cc),
+      bcc: await get(mailboxItem.bcc),
+      subject: await get(mailboxItem.subject),
+      body: await getParam(mailboxItem.body, Office.CoercionType.Text),
+      attachments: await getAttach()
+    };
+    console.log("Email Metadata:", JSON.stringify(data, null, 2));
+
+    const response = await fetch("http://127.0.0.1:4631/OUTLOOK/v1/CheckBody", {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json;charset=utf-8",
+      "Access-Control-Request-Method": "POST"
+      },
+      body: JSON.stringify(data, null, 2)
+    });
+
+    const result = await response.json();
+    console.log("Response from native app:", result);
+    // You can also use this data object for further processing
+    // e.g., send to server, validate content, etc.
+	if(result.allow > 0)
+		event.completed({ allowEvent: true });
+	else
+		event.completed({ allowEvent: false });
+
+  } catch (error) {
+    console.error("Error in generate:", error);
+    event.completed({ allowEvent: true }); // Allow send to proceed even on error
+  }
+}
+
+function onMessageSendHandler(event) {
+  console.log("OnSend triggered.");
+  try {
+    generate(event);
+  } catch (err) {
+    console.error("Error in OnSend:", err);
+    event.completed({ allowEvent: true });
+  }
 }
