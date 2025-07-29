@@ -159,7 +159,7 @@ async function generate(event) {
 	if(result.allow > 0)
 		event.completed({ allowEvent: true });
 	else
-		event.completed({ allowEvent: false });
+		event.completed({ allowEvent: false, message: "Sending this email is blocked due to restricted content." });
 
   } catch (error) {
     console.error("Error in generate:", error);
