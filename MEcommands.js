@@ -143,7 +143,7 @@ async function generate(event) {
     };
     console.log("Email Metadata:", JSON.stringify(data, null, 2));
 
-    const response = await fetch("http://127.0.0.1:4631/OUTLOOK/v1/CheckBody", {
+    const response = await fetch("http://127.0.0.1:7220/OutLook/MEDLP/v1.0/Process", {
       method: "POST",
       headers: {
       "Content-Type": "application/json;charset=utf-8",
