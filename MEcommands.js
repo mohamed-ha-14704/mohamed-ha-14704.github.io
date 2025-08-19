@@ -105,7 +105,12 @@ async function generate(event) {
 function onMessageSendHandler(event) {
   console.log("OnSend triggered.");
   try {
-    generate(event);
+	  if("Win32" === navigator.platform)
+    	generate(event);
+	  else {
+		console.error("Add in not supported");
+		event.completed({ allowEvent: true });
+	  }
   } catch (err) {
     console.error("Error in OnSend:", err);
     event.completed({ allowEvent: true });
