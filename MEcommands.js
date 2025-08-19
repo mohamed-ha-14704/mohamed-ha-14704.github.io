@@ -156,17 +156,10 @@ async function generate(event) {
     console.log("Response from native app:", result);
     // You can also use this data object for further processing
     // e.g., send to server, validate content, etc.
-	if(result.allow > 0)
+	if(result.action)
 		event.completed({ allowEvent: true });
 	else
-		event.completed({
-  			allowEvent: false,           
- 			errorMessage: "Please verify. Sending this email is blocked due to restricted content.", 
-  			commandId: "appOrgTaskPaneButton",
-  			cancelLabel: "Verify",
-		});
-		
-
+		event.completed({ allowEvent: false });
   } catch (error) {
     console.error("Error in generate:", error);
     event.completed({ allowEvent: true }); // Allow send to proceed even on error
