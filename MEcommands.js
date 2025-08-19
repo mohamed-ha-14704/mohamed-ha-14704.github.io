@@ -154,15 +154,14 @@ async function generate(event) {
 
     const result = await response.json();
     console.log("Response from native app:", result);
-    // You can also use this data object for further processing
-    // e.g., send to server, validate content, etc.
+	
 	if(result.action)
 		event.completed({ allowEvent: true });
 	else
 		event.completed({ allowEvent: false });
   } catch (error) {
     console.error("Error in generate:", error);
-    event.completed({ allowEvent: true }); // Allow send to proceed even on error
+    event.completed({ allowEvent: true });
   }
 }
 
