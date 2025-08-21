@@ -105,7 +105,7 @@ async function generate(event) {
 function onMessageSendHandler(event) {
   console.log("OnSend triggered.");
   try {
-	  if("Win32" === navigator.platform)
+	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8))
     	generate(event);
 	  else {
 		console.error("Add in not supported");
