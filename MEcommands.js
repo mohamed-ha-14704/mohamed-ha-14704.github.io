@@ -67,7 +67,7 @@ async function get(a) {
   });
 }
 
-async function generate(event) {
+async function Validate(event) {
   try {
     const data = {
       from: await get(mailboxItem.from),
@@ -105,8 +105,9 @@ async function generate(event) {
 function onMessageSendHandler(event) {
   console.log("OnSend triggered.");
   try {
-	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8))
-    	generate(event);
+	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8)) {
+    	Validate(event);
+	  }
 	  else {
 		console.error("Add in not supported");
 		event.completed({ allowEvent: true });
