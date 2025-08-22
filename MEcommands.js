@@ -1,3 +1,5 @@
+let mailboxItem, officeHostName, agentPort = null;
+
 Office.initialize = function (a) {
   mailboxItem = Office.context.mailbox.item;
   officeHostName = Office.context.mailbox.diagnostics.hostName;
@@ -67,8 +69,35 @@ async function get(a) {
   });
 }
 
+async function checkAvailableAgentPort(event) {
+  const candidatePorts = [7220, 7230, 7240, 7250];
+  for (let port of candidatePorts) {
+    const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`;
+    try {
+      const response = await fetch(url, { method: "GET", mode: "cors" });
+      if (response.ok) {
+        console.log("Port alive:", port);
+        agentPort = port;
+        break;
+      } else {
+        console.log(`Port ${port} responded with status ${response.status}`);
+      }
+    } catch (err) {
+      console.error(`Port ${port} not available:`, err.message);
+    }
+  }
+
+  if (!agentPort) {
+    console.error("No port available.");
+    if (event) {
+      event.completed({ allowEvent: true });
+    }
+  }
+}
+
 async function validate(event) {
   try {
+    await checkAvailableAgentPort(event);
     const data = {
       from: await get(mailboxItem.from),
       to: await get(mailboxItem.to),
@@ -79,8 +108,8 @@ async function validate(event) {
       attachments: await getAttach()
     };
     console.log("Email Metadata:", JSON.stringify(data, null, 2));
-
-    const response = await fetch("http://127.0.0.1:7220/OutLook/MEDLP/v1.0/Process", {
+    const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/Process`;
+    const response = await fetch(url, {
       method: "POST",
       headers: {
       "Content-Type": "application/json;charset=utf-8",
