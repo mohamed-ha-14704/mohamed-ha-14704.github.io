@@ -70,7 +70,7 @@ async function get(a) {
 }
 
 async function checkAvailableAgentPort(event) {
-  const candidatePorts = [7220, 7230, 7240, 7250];
+  const candidatePorts = [7212, 7412, 7612, 7812];
   for (let port of candidatePorts) {
     const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`;
     try {
