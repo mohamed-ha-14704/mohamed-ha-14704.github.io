@@ -108,7 +108,7 @@ async function validate(event) {
       attachments: await getAttach()
     };
     console.log("Email Metadata:", JSON.stringify(data, null, 2));
-    const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/Process`;
+    const url = `http://127.0.0.1:${agentPort}/OutLook/MEDLP/v1.0/Process`;
     const response = await fetch(url, {
       method: "POST",
       headers: {
