@@ -1,19 +1,19 @@
-let mailboxItem, agentPort = null;
+let g_mailboxItem, agentPort = null;
 
 Office.initialize = function (initialize) {
-  mailboxItem = Office.context.mailbox.item;
+  g_mailboxItem = Office.context.mailbox.item;
 };
 
 async function getAttach(){
   return new Promise((resolve) => {
-    mailboxItem.getAttachmentsAsync(async (result) => {
+    g_mailboxItem.getAttachmentsAsync(async (result) => {
       if (result.status === Office.AsyncResultStatus.Succeeded && result.value.length > 0) {
         const attachments = result.value;
         try {
           const enriched = await Promise.all(
             attachments.map((attachment) => {
               return new Promise((res, rej) => {
-                mailboxItem.getAttachmentContentAsync(attachment.id, (contentResult) => {
+                g_mailboxItem.getAttachmentContentAsync(attachment.id, (contentResult) => {
                   if (contentResult.status === Office.AsyncResultStatus.Succeeded) {
                     attachment.format = contentResult.value.format;
                     attachment.content = contentResult.value.content;
@@ -88,12 +88,12 @@ async function validate(event) {
   try {
     await checkAvailableAgentPort(event);
     const data = {
-      from: await getAsyncWrapper(mailboxItem.from),
-      to: await getAsyncWrapper(mailboxItem.to),
-      cc: await getAsyncWrapper(mailboxItem.cc),
-      bcc: await getAsyncWrapper(mailboxItem.bcc),
-      subject: await getAsyncWrapper(mailboxItem.subject),
-      body: await getAsyncWrapper(mailboxItem.body, Office.CoercionType.Text),
+      from: await getAsyncWrapper(g_mailboxItem.from),
+      to: await getAsyncWrapper(g_mailboxItem.to),
+      cc: await getAsyncWrapper(g_mailboxItem.cc),
+      bcc: await getAsyncWrapper(g_mailboxItem.bcc),
+      subject: await getAsyncWrapper(g_mailboxItem.subject),
+      body: await getAsyncWrapper(g_mailboxItem.body, Office.CoercionType.Text),
       attachments: await getAttach()
     };
 
