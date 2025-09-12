@@ -9,7 +9,6 @@ async function getAttach(){
     mailboxItem.getAttachmentsAsync(async (result) => {
       if (result.status === Office.AsyncResultStatus.Succeeded && result.value.length > 0) {
         const attachments = result.value;
-
         try {
           const enriched = await Promise.all(
             attachments.map((attachment) => {
@@ -27,13 +26,11 @@ async function getAttach(){
               });
             })
           );
-
           resolve(enriched);
         } catch (err) {
           console.error("Error while fetching attachment contents:", err);
           resolve(attachments);
         }
-
       } else {
         console.log("Failed to get attachments:", result.error);
         resolve([]);
