@@ -118,12 +118,14 @@ async function validate(event) {
     });
 
     const result = await response.json();
-    console.log("Response from native app:", result);
+    console.log("Response from EDLP app:", result);
 	
-	if(result.action)
+	if(result.allowEvent) {
 		event.completed({ allowEvent: true });
-	else
+	}
+	else {
 		event.completed({ allowEvent: false });
+	}
   } catch (error) {
     console.error("Error in generate:", error);
     event.completed({ allowEvent: true });
