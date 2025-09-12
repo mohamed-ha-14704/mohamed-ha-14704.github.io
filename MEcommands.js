@@ -1,8 +1,7 @@
-let mailboxItem, officeHostName, agentPort = null;
+let mailboxItem, agentPort = null;
 
 Office.initialize = function (a) {
   mailboxItem = Office.context.mailbox.item;
-  officeHostName = Office.context.mailbox.diagnostics.hostName;
 };
 
 async function getAttach(){
@@ -107,7 +106,7 @@ async function validate(event) {
       body: await getParam(mailboxItem.body, Office.CoercionType.Text),
       attachments: await getAttach()
     };
-    console.log("Email Metadata:", JSON.stringify(data, null, 2));
+
     const url = `http://127.0.0.1:${agentPort}/OutLook/MEDLP/v1.0/Process`;
     const response = await fetch(url, {
       method: "POST",
