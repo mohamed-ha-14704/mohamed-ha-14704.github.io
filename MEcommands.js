@@ -87,7 +87,7 @@ async function checkAvailableAgentPort(event) {
 async function validateEvent(event) {
   try {
     await checkAvailableAgentPort(event);
-    const data = {
+    const emailData = {
       from: await getAsyncWrapper(g_mailboxItem.from),
       to: await getAsyncWrapper(g_mailboxItem.to),
       cc: await getAsyncWrapper(g_mailboxItem.cc),
@@ -104,7 +104,7 @@ async function validateEvent(event) {
       "Content-Type": "application/json;charset=utf-8",
       "Access-Control-Request-Method": "POST"
       },
-      body: JSON.stringify(data, null, 2)
+      body: JSON.stringify(emailData, null, 2)
     });
 
     const result = await response.json();
