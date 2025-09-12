@@ -84,7 +84,7 @@ async function checkAvailableAgentPort(event) {
   }
 }
 
-async function validate(event) {
+async function validateEvent(event) {
   try {
     await checkAvailableAgentPort(event);
     const data = {
@@ -127,7 +127,7 @@ function onMessageSendHandler(event) {
   try {
 	  // Add-in runs only on Windows with Outlook Mailbox API v1.8+
 	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8)) {
-    	validate(event);
+    	validateEvent(event);
 	  }
 	  else {
 		console.error("Add in not supported");
