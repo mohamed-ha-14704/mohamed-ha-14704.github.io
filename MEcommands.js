@@ -39,29 +39,22 @@ async function getAttach(){
   });
 }
 
-async function getParam(a, b) {
+async function getAsyncWrapper(obj, param = null) {
   return new Promise((resolve) => {
-    a.getAsync(b, (result) => {
+    const callback = (result) => {
       if (result.status === Office.AsyncResultStatus.Succeeded) {
         resolve(result.value);
       } else {
-        console.error("Failed to get subject:", result.error);
+        console.error("Failed to get value:", result.error);
         resolve("");
       }
-    });
-  });
-}
+    };
 
-async function get(a) {
-  return new Promise((resolve) => {
-    a.getAsync((result) => {
-      if (result.status === Office.AsyncResultStatus.Succeeded) {
-        resolve(result.value);
-      } else {
-        console.error("Failed to get subject:", result.error);
-        resolve("");
-      }
-    });
+    if (param !== null) {
+      obj.getAsync(param, callback);
+    } else {
+      obj.getAsync(callback);
+    }
   });
 }
 
@@ -95,12 +88,12 @@ async function validate(event) {
   try {
     await checkAvailableAgentPort(event);
     const data = {
-      from: await get(mailboxItem.from),
-      to: await get(mailboxItem.to),
-      cc: await get(mailboxItem.cc),
-      bcc: await get(mailboxItem.bcc),
-      subject: await get(mailboxItem.subject),
-      body: await getParam(mailboxItem.body, Office.CoercionType.Text),
+      from: await getAsyncWrapper(mailboxItem.from),
+      to: await getAsyncWrapper(mailboxItem.to),
+      cc: await getAsyncWrapper(mailboxItem.cc),
+      bcc: await getAsyncWrapper(mailboxItem.bcc),
+      subject: await getAsyncWrapper(mailboxItem.subject),
+      body: await getAsyncWrapper(mailboxItem.body, Office.CoercionType.Text),
       attachments: await getAttach()
     };
 
