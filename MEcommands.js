@@ -108,7 +108,7 @@ async function validateEvent(event) {
     });
 
     const result = await response.json();
-    console.log("Response from EDLP app:", result);
+    console.log("Response from EDLP :", result);
 	
 	if(result.allowEvent) {
 		event.completed({ allowEvent: true });
