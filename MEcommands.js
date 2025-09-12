@@ -69,7 +69,7 @@ async function checkAvailableAgentPort(event) {
         agentPort = port;
         break;
       } else {
-        console.log(`Port ${port} responded with status ${response.status}`);
+        console.error(`Port ${port} responded with status ${response.status}`);
       }
     } catch (err) {
       console.error(`Port ${port} not available:`, err.message);
