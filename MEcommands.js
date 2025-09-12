@@ -1,6 +1,6 @@
 let mailboxItem, agentPort = null;
 
-Office.initialize = function (a) {
+Office.initialize = function (initialize) {
   mailboxItem = Office.context.mailbox.item;
 };
 
