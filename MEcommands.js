@@ -1,4 +1,4 @@
-let g_mailboxItem, agentPort = null;
+let g_mailboxItem;
 
 Office.initialize = function (initialize) {
   g_mailboxItem = Office.context.mailbox.item;
@@ -58,7 +58,8 @@ async function getAsyncWrapper(obj, param = null) {
   });
 }
 
-async function checkAvailableAgentPort(event) {
+async function checkAvailableAgentPort() {
+  let resolvedPort = null;
   const candidatePorts = [7212, 7412, 7612, 7812];
   for (let port of candidatePorts) {
     const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`;
@@ -66,7 +67,7 @@ async function checkAvailableAgentPort(event) {
       const response = await fetch(url, { method: "GET", mode: "cors" });
       if (response.ok) {
         console.log("Port alive:", port);
-        agentPort = port;
+        resolvedPort = port;
         break;
       } else {
         console.error(`Port ${port} responded with status ${response.status}`);
@@ -75,18 +76,18 @@ async function checkAvailableAgentPort(event) {
       console.error(`Port ${port} not available:`, err.message);
     }
   }
-
-  if (!agentPort) {
-    console.error("No port available.");
-    if (event) {
-      event.completed({ allowEvent: true });
-    }
-  }
+  return resolvedPort; 
 }
 
 async function validateEvent(event) {
   try {
-    await checkAvailableAgentPort(event);
+    let agentPort = await checkAvailableAgentPort();
+	if (!agentPort) {
+    	console.error("No port available.");
+    	if (event) {
+      		event.completed({ allowEvent: true });
+    	}
+  	}
     const emailData = {
       from: await getAsyncWrapper(g_mailboxItem.from),
       to: await getAsyncWrapper(g_mailboxItem.to),
