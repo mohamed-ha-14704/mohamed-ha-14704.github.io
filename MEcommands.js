@@ -1,19 +1,20 @@
-let g_mailboxItem;
+let g_MailboxItem, g_OfficeHostName;
 
 Office.initialize = function (initialize) {
-  g_mailboxItem = Office.context.mailbox.item;
+  g_MailboxItem = Office.context.mailbox.item;
+  g_OfficeHostName = Office.context.mailbox.diagnostics.hostName;
 };
 
 async function getAttach(){
   return new Promise((resolve) => {
-    g_mailboxItem.getAttachmentsAsync(async (result) => {
+    g_MailboxItem.getAttachmentsAsync(async (result) => {
       if (result.status === Office.AsyncResultStatus.Succeeded && result.value.length > 0) {
         const attachments = result.value;
         try {
           const enriched = await Promise.all(
             attachments.map((attachment) => {
               return new Promise((res, rej) => {
-                g_mailboxItem.getAttachmentContentAsync(attachment.id, (contentResult) => {
+                g_MailboxItem.getAttachmentContentAsync(attachment.id, (contentResult) => {
                   if (contentResult.status === Office.AsyncResultStatus.Succeeded) {
                     attachment.format = contentResult.value.format;
                     attachment.content = contentResult.value.content;
@@ -89,12 +90,12 @@ async function eventValidator(event) {
     	}
   	}
     const emailData = {
-      from: await getAsyncWrapper(g_mailboxItem.from),
-      to: await getAsyncWrapper(g_mailboxItem.to),
-      cc: await getAsyncWrapper(g_mailboxItem.cc),
-      bcc: await getAsyncWrapper(g_mailboxItem.bcc),
-      subject: await getAsyncWrapper(g_mailboxItem.subject),
-      body: await getAsyncWrapper(g_mailboxItem.body, Office.CoercionType.Text),
+      from: await getAsyncWrapper(g_MailboxItem.from),
+      to: await getAsyncWrapper(g_MailboxItem.to),
+      cc: await getAsyncWrapper(g_MailboxItem.cc),
+      bcc: await getAsyncWrapper(g_MailboxItem.bcc),
+      subject: await getAsyncWrapper(g_MailboxItem.subject),
+      body: await getAsyncWrapper(g_MailboxItem.body, Office.CoercionType.Text),
       attachments: await getAttach()
     };
 
@@ -127,7 +128,7 @@ function onMessageSendHandler(event) {
   console.log("OnSend triggered.");
   try {
 	  // Add-in runs only on Windows with Outlook Mailbox API v1.8+
-	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8)) {
+	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) && g_OfficeHostName == "Outlook") {
     	eventValidator(event);
 	  }
 	  else {
