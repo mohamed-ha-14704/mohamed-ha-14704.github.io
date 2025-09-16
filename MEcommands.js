@@ -147,7 +147,7 @@ function onMessageSendHandler(event) {
       g_MailboxItem.notificationMessages.addAsync("unsupported", {
         type: "errorMessage",
         message: "Not supported"
-      });
+        });
 	  
   } catch (err) {
     console.error("Error in OnSend:", err);
