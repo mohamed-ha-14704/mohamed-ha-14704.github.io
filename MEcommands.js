@@ -136,7 +136,7 @@ function onMessageSendHandler(event) {
   console.log("OnSend triggered.");
   try {
 	  // Add-in runs only on Windows with Outlook Mailbox API v1.8+
-	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) && officeHostName === OFFICE_HOST_NAMES.OUTLOOK_CLIENT) {
+	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) && officeHostName === "newOutlookWindows") {
     	eventValidator(event);
 	  }
 	  else {
