@@ -142,7 +142,7 @@ function onMessageSendHandler(event) {
 		console.error("Add in not supported");
 		event.completed({ allowEvent: true });
 	  }
-	  officeHostName === OFFICE_HOST_NAMES.OUTLOOK_CLIENT ? !0 (
+	  officeHostName === OFFICE_HOST_NAMES.OUTLOOK_CLIENT ? !0 : (
       mailboxItem.notificationMessages.addAsync("unsupported", {
         type: "errorMessage",
         message: "Not supported"
