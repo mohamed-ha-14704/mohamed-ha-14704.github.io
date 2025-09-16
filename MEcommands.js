@@ -61,9 +61,9 @@ async function getAsyncWrapper(obj, param = null) {
 
 async function checkAvailableAgentPort() {
   let resolvedPort = null;
-  const candidatePorts = [7212, 7412, 7612, 7812];
+  const candidatePorts = [7212, 7412, 7612];
   for (let port of candidatePorts) {
-    const url = `http://127.0.0.2:${port}/OutLook/MEDLP/v1.0/PortCheck`;
+    const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`;
     try {
       const response = await fetch(url, { method: "GET", mode: "cors" });
       if (response.ok) {
@@ -99,7 +99,7 @@ async function eventValidator(event) {
       attachments: await getAttach()
     };
 
-    const url = `http://127.0.0.2:${agentPort}/OutLook/MEDLP/v1.0/Process`;
+    const url = `http://127.0.0.1:${agentPort}/OutLook/MEDLP/v1.0/Process`;
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -128,7 +128,7 @@ function onMessageSendHandler(event) {
   console.log("OnSend triggered.");
   try {
 	  // Add-in runs only on Windows with new Outlook and Mailbox API v1.8+
-	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8)){ // && g_OfficeHostName === "newOutlookWindows") {
+	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) && g_OfficeHostName === "newOutlookWindows") {
     	eventValidator(event);
 	  }
 	  else {
