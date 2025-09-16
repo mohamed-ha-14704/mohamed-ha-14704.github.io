@@ -132,6 +132,7 @@ function onMessageSendHandler(event) {
     	eventValidator(event);
 	  }
 	  else {
+		  [[
 		console.error("Add in not supported");
       	/* g_MailboxItem.notificationMessages.addAsync("Unsupported", {
         	type: "errorMessage",
