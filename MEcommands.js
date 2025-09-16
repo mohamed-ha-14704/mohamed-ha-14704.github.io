@@ -8,7 +8,8 @@ let g_MailboxItem, g_OfficeHostName, officeHostName;
 Office.initialize = function (initialize) {
   g_MailboxItem = Office.context.mailbox.item;
   g_OfficeHostName = Office.context.mailbox.diagnostics.hostName;
-	
+const hostName = Office.context.mailbox.diagnostics.hostName;
+  console.log("Outlook hostName:", hostName);
   officeHostName = Office.context.mailbox.diagnostics.hostName;
 };
 
@@ -142,12 +143,12 @@ function onMessageSendHandler(event) {
 		console.error("Add in not supported");
 		event.completed({ allowEvent: true });
 	  }
-	  officeHostName === OFFICE_HOST_NAMES.OUTLOOK_CLIENT ? !0 : (
+	  
       mailboxItem.notificationMessages.addAsync("unsupported", {
         type: "errorMessage",
         message: "Not supported"
-      }), !1
-    );
+      });
+	  
   } catch (err) {
     console.error("Error in OnSend:", err);
     event.completed({ allowEvent: true });
