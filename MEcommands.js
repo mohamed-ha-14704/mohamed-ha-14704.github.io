@@ -1,8 +1,15 @@
-let g_MailboxItem, g_OfficeHostName;
+let g_MailboxItem, g_OfficeHostName, officeHostName;
+
+  OFFICE_HOST_NAMES = {
+    OUTLOOK_CLIENT: "Outlook",
+    OUTLOOK_WEB_ACCESS: "OutlookWebApp"
+  };
 
 Office.initialize = function (initialize) {
   g_MailboxItem = Office.context.mailbox.item;
   g_OfficeHostName = Office.context.mailbox.diagnostics.hostName;
+	
+  officeHostName = Office.context.mailbox.diagnostics.hostName;
 };
 
 async function getAttach(){
@@ -128,13 +135,19 @@ function onMessageSendHandler(event) {
   console.log("OnSend triggered.");
   try {
 	  // Add-in runs only on Windows with Outlook Mailbox API v1.8+
-	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) && g_OfficeHostName === "Outlook") {
+	  if("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) && officeHostName === OFFICE_HOST_NAMES.OUTLOOK_CLIENT) {
     	eventValidator(event);
 	  }
 	  else {
 		console.error("Add in not supported");
 		event.completed({ allowEvent: true });
 	  }
+	  officeHostName === OFFICE_HOST_NAMES.OUTLOOK_CLIENT ? !0 (
+      mailboxItem.notificationMessages.addAsync("unsupported", {
+        type: "errorMessage",
+        message: "Not supported"
+      }), !1
+    );
   } catch (err) {
     console.error("Error in OnSend:", err);
     event.completed({ allowEvent: true });
