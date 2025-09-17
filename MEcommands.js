@@ -61,8 +61,11 @@ async function getAsyncWrapper(obj, param = null) {
 
 async function checkAvailableAgentPort() {
   const candidatePorts = [7212, 7412, 7612];
-  const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`;
-  const checks = candidatePorts.map(port => fetch(url, { method: "GET", mode: "cors" })
+  const checks = candidatePorts.map(port =>
+    fetch(`http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`, {
+      method: "GET",
+      mode: "cors"
+    })
       .then(response => {
         if (response.ok) {
           console.log("Port alive:", port);
