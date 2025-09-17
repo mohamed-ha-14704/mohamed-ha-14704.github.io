@@ -1,4 +1,4 @@
-let g_MailboxItem, g_OfficeHostName;
+let g_MailboxItem, g_OfficeHostName, g_TimeOutMS = 4 * 60 * 1000; // 4 minutes;
 
 Office.initialize = function (initialize) {
   g_MailboxItem = Office.context.mailbox.item;
@@ -105,12 +105,11 @@ async function eventValidator(event) {
       body: await getAsyncWrapper(g_MailboxItem.body, Office.CoercionType.Text),
       attachments: await getAttach()
     };
-	  
-	const TIMEOUT_MS = 4 * 60 * 1000; // 4 minutes
+	
     const url = `http://127.0.0.1:${agentPort}/OutLook/MEDLP/v1.0/Process`;
 	
-	const timeout = new Promise(resolve =>
-    	setTimeout(() => resolve({ allowEvent: true }), TIMEOUT_MS)
+	const timeOutCallback = new Promise(resolve =>
+    	setTimeout(() => resolve({ allowEvent: true }), g_TimeOutMS)
   	);
 
 	const request = fetch(url, {
@@ -122,7 +121,7 @@ async function eventValidator(event) {
 	.then(res => ({ allowEvent: !!res.allowEvent }))
 	.catch(() => ({ allowEvent: true }));
 	
-	const result = await Promise.race([timeout, request]);
+	const result = await Promise.race([timeOutCallback, request]);
 	event.completed(result);
 
   } catch (error) {
