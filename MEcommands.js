@@ -105,26 +105,26 @@ async function eventValidator(event) {
       body: await getAsyncWrapper(g_MailboxItem.body, Office.CoercionType.Text),
       attachments: await getAttach()
     };
-
+	  
+	const TIMEOUT_MS = 4 * 60 * 1000; // 4 minutes
     const url = `http://127.0.0.1:${agentPort}/OutLook/MEDLP/v1.0/Process`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-      "Content-Type": "application/json;charset=utf-8",
-      "Access-Control-Request-Method": "POST"
-      },
-      body: JSON.stringify(emailData, null, 2)
-    });
-
-    const result = await response.json();
-    console.log("Response from EDLP :", result);
 	
-	if(result.allowEvent) {
-		event.completed({ allowEvent: true });
-	}
-	else {
-		event.completed({ allowEvent: false });
-	}
+	const timeout = new Promise(resolve =>
+    	setTimeout(() => resolve({ allowEvent: true }), TIMEOUT_MS)
+  	);
+
+	const request = fetch(url, {
+		method: "POST",
+		headers: { "Content-Type": "application/json;charset=utf-8" },
+		body: JSON.stringify(emailData)
+	})
+	.then(r => r.json())
+	.then(res => ({ allowEvent: !!res.allowEvent }))
+	.catch(() => ({ allowEvent: true }));
+	
+	const result = await Promise.race([timeout, request]);
+	event.completed(result);
+
   } catch (error) {
     console.error("Error in generate:", error);
     event.completed({ allowEvent: true });
