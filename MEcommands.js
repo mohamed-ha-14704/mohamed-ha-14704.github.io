@@ -60,24 +60,28 @@ async function getAsyncWrapper(obj, param = null) {
 }
 
 async function checkAvailableAgentPort() {
-  let resolvedPort = null;
   const candidatePorts = [7212, 7412, 7612];
-  for (let port of candidatePorts) {
-    const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`;
-    try {
-      const response = await fetch(url, { method: "GET", mode: "cors" });
-      if (response.ok) {
-        console.log("Port alive:", port);
-        resolvedPort = port;
-        break;
-      } else {
-        console.error(`Port ${port} responded with status ${response.status}`);
-      }
-    } catch (err) {
-      console.error(`Port ${port} not available:`, err.message);
-    }
+  const url = `http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`;
+  const checks = candidatePorts.map(port => fetch(url, { method: "GET", mode: "cors" })
+      .then(response => {
+        if (response.ok) {
+          console.log("Port alive:", port);
+          return port;
+        }
+        throw new Error(`Port ${port} responded with status ${response.status}`);
+      })
+      .catch(err => {
+        console.error(`Port ${port} not available:`, err.message);
+        throw err;
+      })
+  );
+
+  try {
+    return await Promise.any(checks);
+  } catch {
+    console.error("No available port found.");
+    return null;
   }
-  return resolvedPort; 
 }
 
 async function eventValidator(event) {
