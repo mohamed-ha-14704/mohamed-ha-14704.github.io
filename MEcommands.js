@@ -130,7 +130,7 @@ async function eventValidator(event) {
   }
 }
 
-function onMessageSendHandler(event) {
+function main(event) {
   console.log("OnSend triggered.");
   try {
 	  // Add-in runs only on Windows with new Outlook and Mailbox API v1.8+
