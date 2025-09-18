@@ -117,17 +117,8 @@ async function eventValidator(event) {
 		headers: { "Content-Type": "application/json;charset=utf-8" },
 		body: JSON.stringify(emailData)
 	})
-	/* .then(r => r.json())
+	.then(r => r.json())
 	.then(res => ({ allowEvent: !!res.allowEvent }))
-	.catch(() => ({ allowEvent: true })); */
-	.then(r => {
-	  console.log("Raw response:", r);  // <- logs status, headers, etc.
-	  return r.json();
-	})
-	.then(res => {
-	  console.log("Parsed JSON:", res); // <- logs JSON body
-	  return { allowEvent: !!res.allowEvent };
-	})
 	.catch(() => ({ allowEvent: true }));
 	  
 	const result = await Promise.race([timeOutCallback, request]);
