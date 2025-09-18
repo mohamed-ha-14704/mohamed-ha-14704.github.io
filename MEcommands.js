@@ -122,6 +122,7 @@ async function eventValidator(event) {
 	.catch(() => ({ allowEvent: true }));
 	
 	const result = await Promise.race([timeOutCallback, request]);
+	console.log("Response from EDLP :", result);
 	event.completed(result);
 
   } catch (error) {
