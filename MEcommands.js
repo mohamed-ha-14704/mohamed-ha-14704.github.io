@@ -112,7 +112,7 @@ async function eventValidator(event) {
 			attachments: await getAttach()
 		};
 
-		const url = `http://127.0.0.1:${agentPort}/OutLook/MEDLP/v1.0/Process`;
+		const url = `127.0.0.1:${agentPort}/OutLook/MEDLP/v1.0/Process`;
 
 		const timeOutCallback = new Promise(resolve =>
 			setTimeout(() => resolve({ allowEvent: true }), g_TimeOutMS)
