@@ -1,4 +1,4 @@
-let g_MailboxItem, g_OfficeHostName, g_TimeOutMS = 4 * 60 * 1000, ; // 4 minutes;
+let g_MailboxItem, g_OfficeHostName, g_TimeOutMS = 4 * 60 * 1000 ; // 4 minutes;
 let g_s = "http";  // No I18N
 let g_ServiceUrl = `${g_s}://127.0.0.1`;
 
