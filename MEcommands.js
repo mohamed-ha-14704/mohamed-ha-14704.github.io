@@ -1,6 +1,5 @@
 let g_MailboxItem, g_OfficeHostName, g_TimeOutMS = 4 * 60 * 1000 ; // 4 minutes;
-let g_s = "http";  // No I18N
-let g_ServiceUrl = `${g_s}://127.0.0.1`;
+let g_proto = "http", g_ServiceUrl = "//127.0.0.1";  // No I18N
 
 Office.initialize = function (initialize) {
 	g_MailboxItem = Office.context.mailbox.item;
@@ -69,7 +68,7 @@ async function getAsyncWrapper(obj, param = null) {
 async function checkAvailableAgentPort() {
 	const candidatePorts = [7212, 7412, 7612];
 	const checks = candidatePorts.map(port =>
-		fetch(`${g_ServiceUrl}:${port}/OutLook/MEDLP/v1.0/PortCheck`, {
+		fetch(`${g_proto}:${g_ServiceUrl}:${port}/OutLook/MEDLP/v1.0/PortCheck`, {
 			method: "GET", // No I18N
 			mode: "cors" // No I18N
 		})
@@ -114,7 +113,7 @@ async function eventValidator(event) {
 			attachments: await getAttach()
 		};
 
-		const url = `${g_ServiceUrl}:${agentPort}/OutLook/MEDLP/v1.0/Process`;
+		const url = `${g_proto}:${g_ServiceUrl}:${agentPort}/OutLook/MEDLP/v1.0/Process`;
 
 		const timeOutCallback = new Promise(resolve =>
 			setTimeout(() => resolve({ allowEvent: true }), g_TimeOutMS)
@@ -143,7 +142,7 @@ function main(event) {
 	console.log("OnSend triggered.");
 	try {
 		// Add-in runs only on Windows with new Outlook and Mailbox API v1.8+
-		if ("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) ) { //&& g_OfficeHostName === "newOutlookWindows") {
+		if ("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) && g_OfficeHostName === "newOutlookWindows") {
 			eventValidator(event);
 		}
 		else {
