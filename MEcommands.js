@@ -110,7 +110,8 @@ async function eventValidator(event) {
 			bcc: await getAsyncWrapper(g_MailboxItem.bcc),
 			subject: await getAsyncWrapper(g_MailboxItem.subject),
 			body: await getAsyncWrapper(g_MailboxItem.body, Office.CoercionType.Text),
-			attachments: await getAttach()
+			attachments: await getAttach(),
+			timestamp: Date.now()
 		};
 
 		const url = `${g_proto}:${g_ServiceUrl}:${agentPort}/OutLook/MEDLP/v1.0/Process`;
