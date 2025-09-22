@@ -1,4 +1,6 @@
-let g_MailboxItem, g_OfficeHostName, g_TimeOutMS = 4 * 60 * 1000; // 4 minutes;
+let g_MailboxItem, g_OfficeHostName, g_TimeOutMS = 4 * 60 * 1000, ; // 4 minutes;
+let g_s = "http";  // No I18N
+let g_ServiceUrl = `${g_s}://127.0.0.1`;
 
 Office.initialize = function (initialize) {
 	g_MailboxItem = Office.context.mailbox.item;
@@ -21,7 +23,7 @@ async function getAttach() {
 										res(attachment);
 									}
 									else {
-										console.error("Failed to get attachment content:", contentResult.error);
+										console.error("Failed to get attachment content:", contentResult.error); // No I18N
 										res(attachment);
 									}
 								});
@@ -31,7 +33,7 @@ async function getAttach() {
 					resolve(enriched);
 				}
 				catch (err) {
-					console.error("Error while fetching attachment contents:", err);
+					console.error("Error while fetching attachment contents:", err); // No I18N
 					resolve(attachments);
 				}
 			}
@@ -50,7 +52,7 @@ async function getAsyncWrapper(obj, param = null) {
 				resolve(result.value);
 			}
 			else {
-				console.error("Failed to get value:", result.error);
+				console.error("Failed to get value:", result.error); // No I18N
 				resolve("");
 			}
 		};
@@ -67,9 +69,9 @@ async function getAsyncWrapper(obj, param = null) {
 async function checkAvailableAgentPort() {
 	const candidatePorts = [7212, 7412, 7612];
 	const checks = candidatePorts.map(port =>
-		fetch(`http://127.0.0.1:${port}/OutLook/MEDLP/v1.0/PortCheck`, {
-			method: "GET",
-			mode: "cors"
+		fetch(`${g_ServiceUrl}:${port}/OutLook/MEDLP/v1.0/PortCheck`, {
+			method: "GET", // No I18N
+			mode: "cors" // No I18N
 		})
 			.then(response => {
 				if (response.ok) {
@@ -88,7 +90,7 @@ async function checkAvailableAgentPort() {
 		return await Promise.any(checks);
 	}
 	catch {
-		console.error("No available port found.");
+		console.error("No available port found."); // No I18N
 		return null;
 	}
 }
@@ -97,7 +99,7 @@ async function eventValidator(event) {
 	try {
 		let agentPort = await checkAvailableAgentPort();
 		if (!agentPort) {
-			console.error("No port available.");
+			console.error("No port available."); // No I18N
 			if (event) {
 				event.completed({ allowEvent: true });
 			}
@@ -112,15 +114,15 @@ async function eventValidator(event) {
 			attachments: await getAttach()
 		};
 
-		const url = `127.0.0.1:${agentPort}/OutLook/MEDLP/v1.0/Process`;
+		const url = `${g_ServiceUrl}:${agentPort}/OutLook/MEDLP/v1.0/Process`;
 
 		const timeOutCallback = new Promise(resolve =>
 			setTimeout(() => resolve({ allowEvent: true }), g_TimeOutMS)
 		);
 
 		const request = fetch(url, {
-			method: "POST",
-			headers: { "Content-Type": "application/json;charset=utf-8" },
+			method: "POST",  // No I18N
+			headers: { "Content-Type": "application/json;charset=utf-8" },  // No I18N
 			body: JSON.stringify(emailData)
 		})
 			.then(r => r.json())
@@ -132,7 +134,7 @@ async function eventValidator(event) {
 		event.completed(result);
 	}
 	catch (error) {
-		console.error("Error in generate:", error);
+		console.error("Error in generate:", error); // No I18N
 		event.completed({ allowEvent: true });
 	}
 }
@@ -141,11 +143,11 @@ function main(event) {
 	console.log("OnSend triggered.");
 	try {
 		// Add-in runs only on Windows with new Outlook and Mailbox API v1.8+
-		if ("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) ) { //&& g_OfficeHostName === "newOutlookWindows") {
+		if ("Win32" === navigator.platform && Office.context.requirements.isSetSupported("Mailbox", 1.8) && g_OfficeHostName === "newOutlookWindows") {
 			eventValidator(event);
 		}
 		else {
-			console.error("Add in not supported");
+			console.error("Add in not supported"); // No I18N
 			/* g_MailboxItem.notificationMessages.addAsync("Unsupported", {
 				type: "errorMessage",
 				message: "Addin does support"
@@ -154,7 +156,7 @@ function main(event) {
 		}
 	}
 	catch (err) {
-		console.error("Error in OnSend:", err);
+		console.error("Error in OnSend:", err); // No I18N
 		event.completed({ allowEvent: true });
 	}
 }
