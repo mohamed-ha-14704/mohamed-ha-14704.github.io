@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" 
+  xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" 
+  xsi:type="MailApp">
+  <Id>a9c6b99a-5fef-434d-b3e5-f4d5883723b1</Id>
+  <Version>1.0</Version>
+  <ProviderName>ManageEngine</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="ManageEngine Endpoint DLP for Outlook"/>
+  <Description DefaultValue="Enforces DLP policies in Outlook by scanning emails and attachments in real time to classify data, prevent leaks, and ensure compliance."/>
+  <IconUrl DefaultValue="https://cdn.jsdelivr.net/gh/mohamed-ha-14704/Outadd-temp@main/logo.png"/>
+  <HighResolutionIconUrl DefaultValue="https://cdn.jsdelivr.net/gh/mohamed-ha-14704/Outadd-temp@main/logo.png"/>
+  <SupportUrl DefaultValue="https://www.manageengine.com/endpoint-dlp/support.html"/>
+
+  <Hosts>
+    <Host Name="Mailbox" />
+  </Hosts>
+
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.8" />
+    </Sets>
+  </Requirements>
+
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://mohamed-ha-14704.github.io/index.html"/>
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+
+  <Permissions>ReadWriteItem</Permissions>
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Appointment" FormType="Edit"/>
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
+  </Rule>
+  <DisableEntityHighlighting>false</DisableEntityHighlighting>
+  
+ <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">   
+    <Requirements>
+      <bt:Sets DefaultMinVersion="1.8">
+        <bt:Set Name="Mailbox" />
+      </bt:Sets>
+    </Requirements>
+    <Hosts>
+      <Host xsi:type="MailHost">
+		<Runtimes>
+			<Runtime resid="Commands.Url">
+				<Override type="javascript" resid="JSRuntime.Url"/>
+			</Runtime>
+		</Runtimes>
+		
+        <DesktopFormFactor>
+          <FunctionFile resid="Commands.Url" />
+          <ExtensionPoint xsi:type="Events">
+              <Event Type="ItemSend" FunctionExecution="synchronous" FunctionName="main" />
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="https://mohamed-ha-14704.github.io/index.html"/>
+		<bt:Url id="JSRuntime.Url" DefaultValue="https://mohamed-ha-14704.github.io/MEcommands.js"/>
+      </bt:Urls>
+    </Resources>
+	<EquivalentAddins>
+		<EquivalentAddin>
+			<ProgId>Otlk.OutlookAddin</ProgId>
+			<Type>COM</Type>
+		</EquivalentAddin>
+	</EquivalentAddins>
+     </VersionOverrides>
+  </VersionOverrides>
+</OfficeApp>
