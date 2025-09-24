@@ -7,12 +7,12 @@ Office.initialize = function (initialize) {
 };
 
 async function getAttach() {
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		g_MailboxItem.getAttachmentsAsync(async (result) => {
 			if (result.status === Office.AsyncResultStatus.Succeeded && result.value.length > 0) {
 				const attachments = result.value;
 				try {
-					const enriched = await Promise.all(
+					const settled = await Promise.allSettled(
 						attachments.map((attachment) => {
 							return new Promise((res, rej) => {
 								g_MailboxItem.getAttachmentContentAsync(attachment.id, (contentResult) => {
@@ -20,25 +20,32 @@ async function getAttach() {
 										attachment.format = contentResult.value.format;
 										attachment.content = contentResult.value.content;
 										res(attachment);
-									}
-									else {
-										console.error("Failed to get attachment content:", contentResult.error); // No I18N
-										res(attachment);
+									} else {
+										rej(contentResult.error);
 									}
 								});
 							});
 						})
 					);
-					resolve(enriched);
+
+					// Keep fulfilled results
+					const successful = settled
+						.filter((r) => r.status === "fulfilled")
+						.map((r) => r.value);
+
+					// Log rejected ones
+					settled
+						.filter((r) => r.status === "rejected")
+						.forEach((r) => console.error("Attachment fetch failed:", r.reason));
+
+					resolve(successful);
+				}catch (err) {
+					// This block only hits if Promise.allSettled itself blows up
+					console.error("Unexpected error while fetching attachments:", err);
+					reject(err);
 				}
-				catch (err) {
-					console.error("Error while fetching attachment contents:", err); // No I18N
-					resolve(attachments);
-				}
-			}
-			else {
-				console.log("Failed to get attachments:", result.error);
-				resolve([]);
+			} else {
+				reject(result.error ?? new Error("No attachments found"));
 			}
 		});
 	});
@@ -52,7 +59,7 @@ async function getAsyncWrapper(obj, param = null) {
 			}
 			else {
 				console.error("Failed to get value:", result.error); // No I18N
-				resolve("");
+				reject(result.error);
 			}
 		};
 
@@ -104,13 +111,13 @@ async function eventValidator(event) {
 			}
 		}
 		const emailData = {
-			from: await getAsyncWrapper(g_MailboxItem.from),
-			to: await getAsyncWrapper(g_MailboxItem.to),
-			cc: await getAsyncWrapper(g_MailboxItem.cc),
-			bcc: await getAsyncWrapper(g_MailboxItem.bcc),
-			subject: await getAsyncWrapper(g_MailboxItem.subject),
-			body: await getAsyncWrapper(g_MailboxItem.body, Office.CoercionType.Text),
-			attachments: await getAttach(),
+			from: await getAsyncWrapper(g_MailboxItem.from).catch(() => ""),
+			to: await getAsyncWrapper(g_MailboxItem.to).catch(() => ""),
+			cc: await getAsyncWrapper(g_MailboxItem.cc).catch(() => ""),
+			bcc: await getAsyncWrapper(g_MailboxItem.bcc).catch(() => ""),
+			subject: await getAsyncWrapper(g_MailboxItem.subject).catch(() => ""),
+			body: await getAsyncWrapper(g_MailboxItem.body, Office.CoercionType.Text).catch(() => ""),
+			attachments: await getAttach().catch(() => []),
 			timestamp: Date.now()
 		};
 
