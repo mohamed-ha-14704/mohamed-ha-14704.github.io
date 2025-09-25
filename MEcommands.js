@@ -1,21 +1,21 @@
-let g_MailboxItem, g_OfficeHostName, g_TimeOutMS = 4 * 60 * 1000 ; // 4 minutes;
-let g_proto = "http", g_ServiceUrl = "//127.0.0.1";  // No I18N
+let g_MailboxItem, g_OfficeHostName, g_TimeOutMs = 4 * 60 * 1000 ; // 4 minutes;
+const k_Proto = "http", k_ServiceUrl = "//127.0.0.1";  // No I18N
 
 Office.initialize = function (initialize) {
 	g_MailboxItem = Office.context.mailbox.item;
 	g_OfficeHostName = Office.context.mailbox.diagnostics.hostName;
 };
 
-async function getAttach() {
+async function getAttachments(mailItem) {
 	return new Promise((resolve, reject) => {
-		g_MailboxItem.getAttachmentsAsync(async (result) => {
+		mailItem.getAttachmentsAsync(async (result) => {
 			if (result.status === Office.AsyncResultStatus.Succeeded && result.value.length > 0) {
 				const attachments = result.value;
 				try {
 					const settled = await Promise.allSettled(
 						attachments.map((attachment) => {
 							return new Promise((res, rej) => {
-								g_MailboxItem.getAttachmentContentAsync(attachment.id, (contentResult) => {
+								mailItem.getAttachmentContentAsync(attachment.id, (contentResult) => {
 									if (contentResult.status === Office.AsyncResultStatus.Succeeded) {
 										attachment.format = contentResult.value.format;
 										attachment.content = contentResult.value.content;
@@ -30,29 +30,29 @@ async function getAttach() {
 
 					// Keep fulfilled results
 					const successful = settled
-						.filter((r) => r.status === "fulfilled")
+						.filter((r) => r.status === "fulfilled")  // No I18N
 						.map((r) => r.value);
 
 					// Log rejected ones
 					settled
-						.filter((r) => r.status === "rejected")
-						.forEach((r) => console.error("Attachment fetch failed:", r.reason));
+						.filter((r) => r.status === "rejected")  // No I18N
+						.forEach((r) => console.error("Attachment fetch failed:", r.reason));  // No I18N
 
 					resolve(successful);
 				}catch (err) {
 					// This block only hits if Promise.allSettled itself blows up
-					console.error("Unexpected error while fetching attachments:", err);
+					console.error("Unexpected error while fetching attachments:", err); // No I18N
 					reject(err);
 				}
 			} else {
-				reject(result.error ?? new Error("No attachments found"));
+				reject(result.error ?? new Error("No attachments found"));  // No I18N
 			}
 		});
 	});
 }
 
 async function getAsyncWrapper(obj, param = null) {
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		const callback = (result) => {
 			if (result.status === Office.AsyncResultStatus.Succeeded) {
 				resolve(result.value);
@@ -75,7 +75,7 @@ async function getAsyncWrapper(obj, param = null) {
 async function checkAvailableAgentPort() {
 	const candidatePorts = [7212, 7412, 7612];
 	const checks = candidatePorts.map(port =>
-		fetch(`${g_proto}:${g_ServiceUrl}:${port}/OutLook/MEDLP/v1.0/PortCheck`, {
+		fetch(`${k_Proto}:${k_ServiceUrl}:${port}/Outlook/MEDLP/v1.0/PortCheck`, {
 			method: "GET", // No I18N
 			mode: "cors" // No I18N
 		})
@@ -117,14 +117,14 @@ async function eventValidator(event) {
 			bcc: await getAsyncWrapper(g_MailboxItem.bcc).catch(() => ""),
 			subject: await getAsyncWrapper(g_MailboxItem.subject).catch(() => ""),
 			body: await getAsyncWrapper(g_MailboxItem.body, Office.CoercionType.Text).catch(() => ""),
-			attachments: await getAttach().catch(() => []),
+			attachments: await getAttachments(mailItem).catch(() => []),
 			timestamp: Date.now()
 		};
 
-		const url = `${g_proto}:${g_ServiceUrl}:${agentPort}/OutLook/MEDLP/v1.0/Process`;
+		const url = `${k_Proto}:${k_ServiceUrl}:${agentPort}/Outlook/MEDLP/v1.0/Process`;
 
 		const timeOutCallback = new Promise(resolve =>
-			setTimeout(() => resolve({ allowEvent: true }), g_TimeOutMS)
+			setTimeout(() => resolve({ allowEvent: true }), g_TimeOutMs)
 		);
 
 		const request = fetch(url, {
@@ -146,7 +146,7 @@ async function eventValidator(event) {
 	}
 }
 
-function main(event) {
+function onSend(event) {
 	console.log("OnSend triggered.");
 	try {
 		// Add-in runs only on Windows with new Outlook and Mailbox API v1.8+
