@@ -51,7 +51,7 @@ async function getAttach() {
 	});
 }
 
-async function getAsyncWrapper(obj, param = null) {
+async function getAsyncWrapper(obj, param = null)
 	return new Promise((resolve) => {
 		const callback = (result) => {
 			if (result.status === Office.AsyncResultStatus.Succeeded) {
