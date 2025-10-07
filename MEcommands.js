@@ -1,5 +1,5 @@
-let g_MailboxItem, g_OfficeHostName, g_TimeOutMs = 4 * 60 * 1000 ; // 4 minutes;
-const k_Proto = "http", k_ServiceUrl = "//127.0.0.1";  // No I18N
+let g_MailboxItem, g_OfficeHostName; 
+const k_Proto = "http", k_ServiceUrl = "//127.0.0.1", k_TimeOutMs = 4 * 60 * 1000; // 4 minutes // No I18N
 
 Office.initialize = function (initialize) {
 	g_MailboxItem = Office.context.mailbox.item;
@@ -124,7 +124,7 @@ async function eventValidator(event) {
 		const url = `${k_Proto}:${k_ServiceUrl}:${agentPort}/Outlook/MEDLP/v1.0/Process`;
 
 		const timeOutCallback = new Promise(resolve =>
-			setTimeout(() => resolve({ allowEvent: true }), g_TimeOutMs)
+			setTimeout(() => resolve({ allowEvent: true }), k_TimeOutMs)
 		);
 
 		const request = fetch(url, {
@@ -146,7 +146,7 @@ async function eventValidator(event) {
 	}
 }
 
-function main(event) {
+function onSend(event) {
 	console.log("OnSend triggered.");
 	try {
 		// Add-in runs only on Windows with new Outlook and Mailbox API v1.8+
